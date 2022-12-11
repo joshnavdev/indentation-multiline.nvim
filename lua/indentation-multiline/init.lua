@@ -12,10 +12,9 @@ local function set_mode(mode)
   api.nvim_input(mode)
 end
 
-local function set_visual_mode()
-  set_mode("V")
+local function set_initial_mode()
+  set_mode(M._initial_mode)
 end
-
 
 local function get_lines()
   local line_number_start = vim.fn.line('v')
@@ -51,18 +50,22 @@ local function indent_lines(line_number_start, line_number_end, indent_type)
 
   indent(line_number_start, line_number_end, indent_type)
 
-  api.nvim_win_set_cursor(0, {line_number_start, 0})
-  set_visual_mode() -- TODO: get the current mode from context
+  api.nvim_win_set_cursor(0, { line_number_start, 0 })
+  set_initial_mode()
   api.nvim_input(line_count .. direction)
 end
 
 local function indent_single_line(indent_type)
   vim.cmd(indent_type)
-  set_visual_mode()
+  set_initial_mode()
 end
 
-local function indent_lines_by_type(indent_type)
+function M.indent_lines_by_type(indent_type)
   local line_number_start, line_number_end = get_lines()
+  local current_mode = api.nvim_get_mode()
+
+  M._initial_mode = current_mode.mode
+
   if (line_number_start == line_number_end) then
     indent_single_line(indent_type)
   else
@@ -74,8 +77,8 @@ function M.setup()
   -- TODO: Add user_opts
   local opts = { silent = true, noremap = true }
 
-  keymap.set('v', M.config.indent_mapping, function () indent_lines_by_type('>')  end, opts)
-  keymap.set('v', M.config.unindent_mapping, function () indent_lines_by_type('<') end, opts)
+  keymap.set('v', M.config.indent_mapping, function () M.indent_lines_by_type('>')  end, opts)
+  keymap.set('v', M.config.unindent_mapping, function () M.indent_lines_by_type('<') end, opts)
 end
 
 return M
