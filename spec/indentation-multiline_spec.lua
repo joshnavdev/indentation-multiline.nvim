@@ -1,3 +1,12 @@
+local find_map = function(lhs)
+  local maps = vim.api.nvim_get_keymap("v")
+  for _, map in ipairs(maps) do
+    if map.lhs == lhs then
+      return map
+    end
+  end
+end
+
 local mock = require("luassert.mock")
 
 describe("Indentation Multiline", function()
@@ -53,4 +62,50 @@ describe("Indentation Multiline", function()
       end)
     end
   end)
+
+  describe("setup function", function ()
+    describe("default setup", function ()
+      local lhss = { "<Tab>", "<S-Tab>" }
+
+      before_each(function ()
+        module.setup()
+      end)
+
+      after_each(function ()
+        module._clear_setup()
+      end)
+
+      for _, lhs in ipairs(lhss) do
+        it("Should map " .. lhs .. " by default", function ()
+          local found_mapping = find_map(lhs)
+          assert.is_table(found_mapping)
+          assert.is_function(found_mapping.callback)
+        end)
+      end
+    end)
+
+    describe("user config setup", function ()
+      local lhss = { "[/", "[," }
+
+      before_each(function ()
+        module.setup({
+          indent_mapping = "[/",
+          unindent_mapping = "[,"
+        })
+      end)
+
+      after_each(function ()
+        module._clear_setup()
+      end)
+
+      for _, lhs in ipairs(lhss) do
+        it("Should map " .. lhs .. " by user config", function ()
+          local found_mapping = find_map(lhs)
+          assert.is_table(found_mapping)
+          assert.is_function(found_mapping.callback)
+        end)
+      end
+    end)
+  end)
 end)
+

@@ -73,8 +73,14 @@ function M.indent_lines_by_type(indent_type)
   end
 end
 
-function M.setup()
-  -- TODO: Add user_opts
+function M._clear_setup()
+  keymap.del("v", M.config.indent_mapping)
+  keymap.del("v", M.config.unindent_mapping)
+end
+
+function M.setup(user_opts)
+  M.config = vim.tbl_extend("force", M.config, user_opts or {})
+
   local opts = { silent = true, noremap = true }
 
   keymap.set("v", M.config.indent_mapping, function()
