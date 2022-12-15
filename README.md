@@ -7,14 +7,13 @@ NeoVim Plugin written in Lua to indent multilines in an easy way.
 
 ## Install
 
-- Requires neovim version 0.7 abode.
-- Requires plenary feature.
+- Requires neovim version 0.7 above.
 - Install this plugin like any other Vim plugin, e.g. with [packer.nvim](https://github.com/wbthomason/packer.nvim):
   ```lua
   local use = require('packer').use
   require('packer').startup(function()
     use 'wbthomason/packer.nvim' -- Package manager
-    use { 'joshnavru/indentation-multiline', requires = 'nvim-lua/plenary.nvim' }
+    use 'joshnavru/indentation-multiline'
   end)
   ```
 
